@@ -18,13 +18,13 @@ async function productCtrl(req, res) {
             return res.status(404).json({ message: "Category not found" });
         }
 
-        // Validate and handle file
-        if (!req.file) {
-            return res.status(400).json({ message: "Image file is required" });
+        // handle image upload
+        const imgUrls = [];
+        for (const file of req.files) {
+            const imgPath = file.path;
+            const imgUrl = await uploadImage(imgPath);
+            imgUrls.push(imgUrl.secure_url);
         }
-
-        const imgPath = req.file.path
-        const imgUrl = await uploadImage(imgPath)
 
         // Create new product
         const product = new productSchema({
@@ -32,14 +32,14 @@ async function productCtrl(req, res) {
             description,
             price,
             fragrance,
-            image: imgUrl.secure_url,
+            images: imgUrls,
             subCategory,
             category: foundCategory.categoryName,
             discount
         });
         await product.save()
 
-         // Update category with product
+        // Update category with product
         await categorySchema.findOneAndUpdate(
             { categoryName: category },
             { $push: { product: product.name } },
@@ -123,7 +123,6 @@ async function updateSingleProductCtrl(req, res) {
         res.status(500).json({ error: "Internal server error", status: "failed" });
     }
 }
-
 
 async function deleteProduct(req, res) {
     try {

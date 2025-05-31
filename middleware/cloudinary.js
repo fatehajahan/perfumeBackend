@@ -9,15 +9,20 @@ cloudinary.config({
 
 
 const uploadImage = async (imgUrlPath) => {
-    
+
     try {
-        if(!imgUrlPath) return null
+        if (!imgUrlPath) return null
         const result = await cloudinary.uploader.upload(imgUrlPath)
         fs.unlinkSync(imgUrlPath)
         return result
     } catch (error) {
-        console.log(error)
-        fs.unlinkSync(imgUrlPath)
+        console.log(error);
+        try {
+            fs.unlinkSync(imgUrlPath);
+        } catch (err) {
+            console.log("Error deleting file:", err);
+        }
+        return null;  // explicitly indicate failure
     }
 }
 

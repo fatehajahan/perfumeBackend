@@ -68,10 +68,6 @@ function dashBoard(req, res) {
 function getCurrentUser(req, res) {
     console.log(req.session.user)
     res.send(req.session.user)
-    // if(!req.session) {
-    //     return res.json({ error: 'unauthorized' })
-    // }
-    // return req.session.user
 }
 
 module.exports = { logInCtrl, dashBoard, logout, getCurrentUser }

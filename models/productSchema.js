@@ -18,8 +18,8 @@ const productSchema = new Schema({
     fragrance: {
         type: String
     },
-    image: {
-        type: String
+    images: {
+        type: [String]
     },
     category: {
         // type: Schema.Types.ObjectId,

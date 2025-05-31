@@ -17,10 +17,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 route.post("/createproduct",
-    upload.single("image"),
+    upload.array("images", 4),
     productCtrl)
 route.get("/getallproduct", getAllProductCtrl)
-route.patch("/updatesingleproduct/:id", upload.single("image"), updateSingleProductCtrl)
+route.patch("/updatesingleproduct/:id", upload.array("images", 4), updateSingleProductCtrl)
 route.delete("/deleteproduct/:id", deleteProduct)
-
+ 
 module.exports = route
