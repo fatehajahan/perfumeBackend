@@ -26,15 +26,16 @@ const store = new MongoDBStore({
     collection: 'mySessions'
 })
 
+app.set('trust proxy', 1);
 app.use(
     session({
         secret: 'fateha',
         resave: false,
         saveUninitialized: false,
         cookie: {
-            secure: false,
+            secure: true,
             httpOnly: true,
-            sameSite: 'lax'
+            sameSite: 'none'
         },
         store: store
     })
