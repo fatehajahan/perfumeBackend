@@ -25,7 +25,10 @@ async function categoryCtrl(req, res) {
 
 async function getAllCategoryCtrl(req, res) {
     try {
-        const allCategory = await categorySchema.find({})
+        const allCategory = await categorySchema.find({}).populate("subCategory").populate("product")
+        if (!allCategory || allCategory.length === 0) {
+            return res.status(404).json({ error: "No categories found", statues: "failed" })
+        }
         res.status(200).json({
             message: "get all category",
             statues: "success",
@@ -97,8 +100,3 @@ async function deleteCategoryCtrl(req, res) {
 
 
 module.exports = { categoryCtrl, getAllCategoryCtrl, getSingleCategoryCtrl, updateSingleCategoryCtrl, deleteCategoryCtrl }
-
-//hw:
-//subcategory shob category r moto complete korte hobe
-//controller e product upload korar shob code, shema ay product er schema ready kore ante hobe. date push kore next class a niye jaite hobe
-//product - name, price, iamge

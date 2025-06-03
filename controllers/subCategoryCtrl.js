@@ -18,7 +18,7 @@ async function subCategoryCtrl(req, res) {
     await categorySchema.findOneAndUpdate(
         { categoryName: category },
         {
-            $push: { subCategory: subCategory.subCategoryName }
+            $push: { subCategory: subCategory._id }
         },
         { new: true }
     )

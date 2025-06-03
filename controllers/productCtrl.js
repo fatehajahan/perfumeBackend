@@ -42,7 +42,7 @@ async function productCtrl(req, res) {
         // Update category with product
         await categorySchema.findOneAndUpdate(
             { categoryName: category },
-            { $push: { product: product.name } },
+            { $push: { product: product._id } },
             { new: true }
         );
 

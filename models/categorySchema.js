@@ -14,11 +14,11 @@ const categorySchema = new Schema({
     },
     subCategory: [{
         // type: Schema.Types.ObjectId, (eta tokhn use korte hobe jokhn _id array te dibo.)
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "SubcategoryList"
     }],
     product: [{
-        type: String, 
+        type: mongoose.Schema.Types.ObjectId, 
         ref: "Product"
     }]  
 })
