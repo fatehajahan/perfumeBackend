@@ -4,24 +4,26 @@ const { Schema } = mongoose
 const categorySchema = new Schema({
     categoryName: {
         type: String,
-        require: true,
+        required: true,
         trim: true
     },
     categoryDescription: {
         type: String,
-        require: true,
+        required: true,
         trim: true
     },
     subCategory: [{
-        // type: Schema.Types.ObjectId, (eta tokhn use korte hobe jokhn _id array te dibo.)
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SubcategoryList"
+        type: Schema.Types.ObjectId,
+        ref: "SubcategoryList",
+        default: []
     }],
     product: [{
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Product"
-    }]  
-})
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+        default: []
+    }]
+});
+
 
 module.exports = mongoose.model("CategoryList", categorySchema)
 // Compare this snippet from controllers/categoryCtrl.js:

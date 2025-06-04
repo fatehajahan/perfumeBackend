@@ -1,32 +1,28 @@
-const uploadImage = require("../middleware/cloudinary")
-const categorySchema = require("../models/categorySchema")
-const productSchema = require("../models/productSchema")
+const uploadImage = require("../middleware/cloudinary");
+const categorySchema = require("../models/categorySchema");
+const productSchema = require("../models/productSchema");
 
 async function productCtrl(req, res) {
     try {
         const { name, description, price, fragrance, category, subCategory, discount } = req.body;
 
-        // Validate required fields first
         if (!name || !price || !description || !fragrance || !category) {
-            return res.status(400).json({ message: "All fields are required" });
+            return res.status(400).json({ message: "All fields are required", status: "failed" });
         }
 
-        // Find category
-        const foundCategory = await categorySchema.findOne({ categoryName: category });
-        console.log(foundCategory)
+        const foundCategory = await categorySchema.findById(category);
         if (!foundCategory) {
-            return res.status(404).json({ message: "Category not found" });
+            return res.status(404).json({ message: "Category not found", status: "failed" });
         }
 
-        // handle image upload
         const imgUrls = [];
-        for (const file of req.files) {
-            const imgPath = file.path;
-            const imgUrl = await uploadImage(imgPath);
-            imgUrls.push(imgUrl.secure_url);
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const imgUrl = await uploadImage(file.path);
+                imgUrls.push(imgUrl.secure_url);
+            }
         }
 
-        // Create new product
         const product = new productSchema({
             name,
             description,
@@ -34,51 +30,58 @@ async function productCtrl(req, res) {
             fragrance,
             images: imgUrls,
             subCategory,
-            category: foundCategory.categoryName,
+            category: foundCategory._id,
             discount
         });
-        await product.save()
+        await product.save();
 
-        // Update category with product
-        await categorySchema.findOneAndUpdate(
-            { categoryName: category },
+        await categorySchema.findByIdAndUpdate(
+            foundCategory._id,
             { $push: { product: product._id } },
             { new: true }
         );
 
-        res.status(200).json({
-            message: "product created successfully", status: "success",
+        res.status(201).json({
+            message: "Product created successfully",
+            status: "success",
             data: product
-        })
+        });
     } catch (error) {
-        console.log(error)
-        res.status(400).json({
-            message: "product creation failed", statues: "Failed"
-        })
+        console.error(error);
+        res.status(500).json({ message: "Product creation failed", status: "failed" });
     }
 }
+
 async function getAllProductCtrl(req, res) {
     try {
-        const allProduct = await productSchema.find({})
+        const allProducts = await productSchema.find({});
         res.status(200).json({
-            message: "get all category",
-            statues: "success",
-            data: allProduct
-        })
+            message: "Fetched all products",
+            status: "success",
+            data: allProducts
+        });
     } catch (error) {
-        res.status(400).json({ error: "internal server error", statues: "failed" })
+        console.error(error);
+        res.status(500).json({ error: "Internal server error", status: "failed" });
     }
 }
 
 async function getSingleProductCtrl(req, res) {
-    const { id } = req.params //we need to use params when we need id. 
-    const getSingleProduct = await productSchema.findOne({ _id: id })
-
-    res.status(200).json({
-        message: "get single category",
-        statues: "success",
-        data: getSingleProduct
-    })
+    try {
+        const { id } = req.params;
+        const product = await productSchema.findById(id);
+        if (!product) {
+            return res.status(404).json({ error: "Product not found", status: "failed" });
+        }
+        res.status(200).json({
+            message: "Fetched single product",
+            status: "success",
+            data: product
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error", status: "failed" });
+    }
 }
 
 async function updateSingleProductCtrl(req, res) {
@@ -86,9 +89,9 @@ async function updateSingleProductCtrl(req, res) {
         const { id } = req.params;
         const { name, description, price, fragrance, category, subCategory, discount } = req.body;
 
-        const foundCategory = await categorySchema.findOne({ categoryName: category });
+        const foundCategory = await categorySchema.findById(category);
         if (!foundCategory) {
-            return res.status(404).json({ message: "Category not found" });
+            return res.status(404).json({ message: "Category not found", status: "failed" });
         }
 
         const updateData = {
@@ -96,26 +99,24 @@ async function updateSingleProductCtrl(req, res) {
             description,
             price,
             fragrance,
-            category: foundCategory.categoryName,
+            category: foundCategory._id,
             subCategory,
-            discount,
+            discount
         };
 
-        // Handle image if uploaded
         if (req.file) {
-            const imgPath = req.file.path;
-            const imgUrl = await uploadImage(imgPath);
-            updateData.image = imgUrl.secure_url;
+            const imgUrl = await uploadImage(req.file.path);
+            updateData.images = [imgUrl.secure_url];
         }
 
         const updatedProduct = await productSchema.findByIdAndUpdate(id, updateData, { new: true });
-
         if (!updatedProduct) {
-            return res.status(404).json({ message: "Product not found" });
+            return res.status(404).json({ message: "Product not found", status: "failed" });
         }
 
         res.status(200).json({
             message: "Product updated successfully",
+            status: "success",
             data: updatedProduct
         });
     } catch (error) {
@@ -127,18 +128,26 @@ async function updateSingleProductCtrl(req, res) {
 async function deleteProduct(req, res) {
     try {
         const { id } = req.params;
-        const deleteProduct = await productSchema.findByIdAndDelete(id);
+        const deletedProduct = await productSchema.findByIdAndDelete(id);
+        if (!deletedProduct) {
+            return res.status(404).json({ error: "Product not found", status: "failed" });
+        }
 
         res.status(200).json({
-            message: "Category deleted successfully",
-            data: deleteProduct
+            message: "Product deleted successfully",
+            status: "success",
+            data: deletedProduct
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({
-            message: "Internal server error",
-            status: "error"
-        });
+        res.status(500).json({ error: "Internal server error", status: "failed" });
     }
 }
-module.exports = { productCtrl, getAllProductCtrl, deleteProduct, updateSingleProductCtrl, getSingleProductCtrl }
+
+module.exports = {
+    productCtrl,
+    getAllProductCtrl,
+    getSingleProductCtrl,
+    updateSingleProductCtrl,
+    deleteProduct
+};
