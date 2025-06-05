@@ -1,5 +1,5 @@
 const express = require("express")
-const { productCtrl, getAllProductCtrl, deleteProduct, updateSingleProductCtrl } = require("../../controllers/productCtrl")
+const { productCtrl, getAllProductCtrl, deleteProduct, updateSingleProductCtrl, getSingleProductCtrl } = require("../../controllers/productCtrl")
 const multer = require('multer')
 const route = express.Router()
 
@@ -20,6 +20,7 @@ route.post("/createproduct",
     upload.array("images", 4),
     productCtrl)
 route.get("/getallproduct", getAllProductCtrl)
+route.get("/getsingleproduct/:id", getSingleProductCtrl)
 route.patch("/updatesingleproduct/:id", upload.array("images", 4), updateSingleProductCtrl)
 route.delete("/deleteproduct/:id", deleteProduct)
  
