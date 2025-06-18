@@ -54,11 +54,17 @@ async function productCtrl(req, res) {
 
 async function getAllProductCtrl(req, res) {
     try {
-        const allProducts = await productSchema.find({});
+        const page = parseInt(req.query.page - 1)
+        const productPerPage = parseInt(req.query.size)
+
+        const totalProducts = await productSchema.countDocuments(); //koyta product ache
+
+        const allProducts = await productSchema.find({}).limit(productPerPage).skip(page * productPerPage)
         res.status(200).json({
             message: "Fetched all products",
             status: "success",
-            data: allProducts
+            data: allProducts,
+            totalProducts: totalProducts
         });
     } catch (error) {
         console.error(error);
