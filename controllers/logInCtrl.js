@@ -41,7 +41,7 @@ async function logInCtrl(req, res) {
         role: existingUser.role
     };
     req.session.save();
-    return res.status(200).json({ success: true, message: 'Login successful' });
+    return res.status(200).json({ success: true, message: 'Login successful', user:req.session.user });
 }
 
 function logout(req, res) {
