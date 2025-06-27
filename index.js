@@ -22,7 +22,7 @@ app.options('*', cors(corsOptions));
 
 app.use(express.json());
 const store = new MongoDBStore({
-    uri: `${process.env.DB_URL}`,
+    uri: process.env.DB_URL,
     collection: 'mySessions'
 })
 
