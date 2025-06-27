@@ -61,6 +61,6 @@ async function getAllOrderCtrl(req, res) {
         console.error(error);
         res.status(500).json({ error: "Internal server error", status: "failed" });
     }
-}
+}   
 
 module.exports = { orderCtrl, getAllOrderCtrl }
