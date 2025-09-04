@@ -22,7 +22,7 @@ const uploadImage = async (imgUrlPath) => {
         } catch (err) {
             console.log("Error deleting file:", err);
         }
-        return null;  // explicitly indicate failure
+        return null; 
     }
 }
 
