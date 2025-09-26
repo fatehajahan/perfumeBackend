@@ -18,8 +18,8 @@ async function productCtrl(req, res) {
         const imgUrls = [];
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {
-                const imgUrl = await uploadImage(file.path);
-                imgUrls.push(imgUrl.secure_url);
+                const imgUrl = await uploadImage(file.buffer);
+                if (imgUrl) imgUrls.push(imgUrl.secure_url);
             }
         }
 

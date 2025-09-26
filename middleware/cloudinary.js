@@ -8,22 +8,31 @@ cloudinary.config({
 });
 
 
-const uploadImage = async (imgUrlPath) => {
-
+const uploadImage = async (fileBuffer) => {
     try {
-        if (!imgUrlPath) return null
-        const result = await cloudinary.uploader.upload(imgUrlPath)
-        fs.unlinkSync(imgUrlPath)
-        return result
+        if (!fileBuffer) return null;
+
+        // Cloudinary upload using "stream" method for buffer
+        const streamUpload = (buffer) => {
+            return new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    { folder: "products" }, // optional: store in folder
+                    (error, result) => {
+                        if (result) resolve(result);
+                        else reject(error);
+                    }
+                );
+                stream.end(buffer);
+            });
+        };
+
+        const result = await streamUpload(fileBuffer);
+        return result;
     } catch (error) {
-        console.log(error);
-        try {
-            fs.unlinkSync(imgUrlPath);
-        } catch (err) {
-            console.log("Error deleting file:", err);
-        }
-        return null; 
+        console.log("Cloudinary upload error:", error);
+        return null;
     }
-}
+};
+
 
 module.exports = uploadImage

@@ -80,30 +80,6 @@ async function updateSingleCategoryCtrl(req, res) {
         message: "category updated successfully",
         updateCategory
     })
-     
-    //try {
-    //     const { id } = req.params;
-    //     const { categoryName, categoryDescription } = req.body;
-
-    //     const updatedCategory = await categorySchema.findByIdAndUpdate(
-    //         id,
-    //         { categoryName, categoryDescription },
-    //         { new: true }
-    //     );
-
-    //     if (!updatedCategory) {
-    //         return res.status(404).json({ error: "Category not found", status: "failed" });
-    //     }
-
-    //     res.status(200).json({
-    //         message: "Category updated successfully",
-    //         status: "success",
-    //         data: updatedCategory
-    //     });
-    // } catch (error) {
-    //     console.error(error);
-    //     res.status(500).json({ error: "Internal server error", status: "failed" });
-    // }
 }
 
 async function deleteCategoryCtrl(req, res) {
