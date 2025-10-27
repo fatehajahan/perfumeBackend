@@ -5,7 +5,7 @@ async function emailVarification(email, otp) {
         service: "gmail",
         auth: {
             user: "fatehajahan2002@gmail.com",
-            pass: "lbcmlmggrvyvmryj",
+            pass: "qzpsbbnkucntwqvv",
         },
     });
 
