@@ -40,12 +40,14 @@ async function registrationCtrl(req, res) {
         })
         emailVarification(email, otp)
         users.save()
+        
+        res.status(200).json({
+            message: 'registration done',
+            status: 'success',
+            data: users
+        })
     })
 
-    res.status(200).json({
-        message: 'registration done',
-        status: 'success',
-    })
 }
 // for all users
 async function allUserListsCtrl(req, res) {
