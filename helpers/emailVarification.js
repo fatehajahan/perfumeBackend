@@ -9,13 +9,17 @@ async function emailVarification(email, otp) {
         },
     });
 
-    const info = await transporter.sendMail({
-        from: '"PerfumeShop 👻" <fatehajahan2002@gmail.com>',
-        to: email, 
-        subject: "Hello ✔", 
-        text: "Hello world?", 
-        html: `<b>This is a perfume shop. here is your OTP : ${otp}</b>`, 
-    });
+    try {
+        const info = await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "OTP Verification",
+            text: `Your OTP is ${otp}`
+        });
+        console.log("Email sent:", info.response);
+    } catch (err) {
+        console.log("Nodemailer error:", err);
+    }
 }
 
 module.exports = emailVarification
