@@ -13,7 +13,7 @@ async function emailVarification(email, otp) {
         const info = await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
-            subject: "OTP Verification",
+            subject: "Perfume: OTP Verification",
             text: `Your OTP is ${otp}`
         });
         console.log("Email sent:", info.response);
