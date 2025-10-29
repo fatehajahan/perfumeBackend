@@ -6,47 +6,50 @@ const crypto = require('crypto') // otp
 const logInCtrl = require("./logInCtrl")
 
 async function registrationCtrl(req, res) {
-    try {
-        const { firstName, lastName, email, password } = req.body;
-        if (!firstName || !lastName) return res.json({ error: 'firstname & lastname is required ' });
-        if (!email) return res.json({ error: 'email is required' });
-        if (!emailValidation(email)) return res.json({ error: 'email is not valid' });
+  try {
+    const { firstName, lastName, email, password } = req.body;
 
-        const exsistingEmail = await userSchema.find({ email });
-        if (exsistingEmail.length > 0) return res.json({ error: 'email is in use' });
-        if (!password) return res.json({ error: 'password is required' });
+    if (!firstName || !lastName) return res.json({ error: 'Firstname & lastname are required' });
+    if (!email) return res.json({ error: 'Email is required' });
+    if (!emailValidation(email)) return res.json({ error: 'Email is not valid' });
 
-        const otp = crypto.randomInt(10000, 99999).toString();
-        const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+    const existingEmail = await userSchema.findOne({ email });
+    if (existingEmail) return res.json({ error: 'Email is already in use' });
+    if (!password) return res.json({ error: 'Password is required' });
 
-        // Use await bcrypt.hash instead of callback
-        const hash = await bcrypt.hash(password, 10);
+    const otp = crypto.randomInt(10000, 99999).toString();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+    const hash = await bcrypt.hash(password, 10);
 
-        const users = new userSchema({
-            firstName,
-            lastName,
-            email,
-            password: hash,
-            otp,
-            otpExpiry,
-        });
+    const user = new userSchema({
+      firstName,
+      lastName,
+      email,
+      password: hash,
+      otp,
+      otpExpiry,
+    });
 
-        // await email sending
-        await emailVarification(email, otp);
+    await user.save();
 
-        await users.save();
+    // ✅ Respond immediately so frontend doesn’t wait
+    res.status(200).json({
+      message: 'Registration successful! Check your email for OTP.',
+      status: 'success',
+      data: user
+    });
 
-        res.status(200).json({
-            message: 'registration done',
-            status: 'success',
-            data: users
-        });
+    // ✅ Send email afterward (non-blocking)
+    emailVarification(email, otp)
+      .then(() => console.log('OTP email sent to', email))
+      .catch(err => console.error('Failed to send OTP:', err.message));
 
-    } catch (err) {
-        console.log("Registration error:", err);
-        res.status(500).json({ error: "Registration failed", details: err.message });
-    }
+  } catch (err) {
+    console.log('Registration error:', err);
+    res.status(500).json({ error: 'Registration failed', details: err.message });
+  }
 }
+
 
 // for all users
 async function allUserListsCtrl(req, res) {
