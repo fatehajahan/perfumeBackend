@@ -1,27 +1,25 @@
-const nodemailer = require("nodemailer");
+const nodemailer = require("nodemailer")
 
 async function emailVarification(email, otp) {
     const transporter = nodemailer.createTransport({
-        host: "sandbox.smtp.mailtrap.io",
-        port: 2525,
+        service: "gmail",
         auth: {
-            user: process.env.MAILTRAP_USER,
-            pass: process.env.MAILTRAP_PASS
-        }
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD,
+        },
     });
 
     try {
         const info = await transporter.sendMail({
-            from: "perfume@mailtrap.io",
+            from: process.env.EMAIL_USER,
             to: email,
             subject: "Perfume: OTP Verification",
             text: `Your OTP is ${otp}`
         });
-
         console.log("Email sent:", info.response);
     } catch (err) {
         console.log("Nodemailer error:", err);
     }
 }
 
-module.exports = emailVarification;
+module.exports = emailVarification
