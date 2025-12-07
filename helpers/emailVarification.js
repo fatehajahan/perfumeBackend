@@ -4,8 +4,8 @@ async function emailVarification(email, otp) {
     const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-            user: "fatehajahan2002@gmail.com",
-            pass: "qzpsbbnkucntwqvv",
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
         },
     });
 
